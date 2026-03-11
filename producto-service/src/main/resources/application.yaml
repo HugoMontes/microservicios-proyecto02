@@ -1,3 +1,6 @@
 spring:
   application:
     name: producto-service
+
+  mongodb:
+    uri: mongodb://localhost:27017/producto-service
