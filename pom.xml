@@ -20,6 +20,7 @@
     <modules>
         <module>producto-service</module>
         <module>order-service</module>
+        <module>inventario-service</module>
     </modules>
 
     <properties>
