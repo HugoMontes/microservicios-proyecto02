@@ -1,5 +1,6 @@
 package com.msvc.order.service;
 
+import com.msvc.order.dto.InventarioResponse;
 import com.msvc.order.dto.OrderLineItemDto;
 import com.msvc.order.dto.OrderRequest;
 import com.msvc.order.entity.Order;
@@ -7,7 +8,9 @@ import com.msvc.order.entity.OrderLineItems;
 import com.msvc.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,9 +21,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
+    private final WebClient webClient;
+
     // Constructor para inyeccion de dependencias
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, WebClient webClient) {
         this.orderRepository = orderRepository;
+        this.webClient = webClient;
     }
 
     // Procesa y guarda un nuevo pedido
@@ -35,8 +41,37 @@ public class OrderService {
                 .collect(Collectors.toList()); // Recolecta los resultados en una nueva lista
         // Establecer la relación bidireccional
         order.setOrderLineItems(orderLineItems);
-        // Persistir en base de datos
-        orderRepository.save(order);
+
+        // Obtener solo los codigos SKU de cada producto en una lista ["iphone_15", "samsung_s23", "xiaomi_13"]
+        List<String> codigoSku = order.getOrderLineItems().stream()
+                .map(OrderLineItems::getCodigoSku)
+                .collect(Collectors.toList());
+
+        System.out.println("Codigos sku : " + codigoSku);
+
+        // Llamar a inventario-service para verificar disponibilidad
+        // Envía la lista de SKUs como parámetros de consulta
+        InventarioResponse[] inventarioResponseArray = webClient.get()
+                .uri("http://localhost:8082/api/inventario", uriBuilder -> uriBuilder
+                        .queryParam("codigoSku", codigoSku).build())
+                .retrieve()
+                // .bodyToMono(InventarioResponse[].class)
+                .bodyToMono(InventarioResponse[].class)
+                .block();
+
+        // Verificar si TODOS los productos tienen stock disponible
+        // allMatch() retorna true si TODOS los elementos cumplen la condición
+        boolean allProductosInStock = Arrays.stream(inventarioResponseArray)
+                .allMatch(InventarioResponse::isInStock);
+
+        // Si todos los productos estan disponibles, entonces guardamos
+        if (allProductosInStock) {
+            // Persistir en base de datos
+            orderRepository.save(order);
+        } else {
+            // Lanzar excepción si algún producto no tiene stock
+            throw new IllegalArgumentException("El producto no esta en stock");
+        }
     }
 
     // Convierte un DTO (OrderLineItemDto) a una entidad (OrderLineItems).
