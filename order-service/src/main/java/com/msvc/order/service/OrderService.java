@@ -21,12 +21,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    private final WebClient webClient;
+    // private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     // Constructor para inyeccion de dependencias
-    public OrderService(OrderRepository orderRepository, WebClient webClient) {
+    public OrderService(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
         this.orderRepository = orderRepository;
-        this.webClient = webClient;
+        this.webClientBuilder = webClientBuilder;
     }
 
     // Procesa y guarda un nuevo pedido
@@ -51,8 +52,9 @@ public class OrderService {
 
         // Llamar a inventario-service para verificar disponibilidad
         // Envía la lista de SKUs como parámetros de consulta
-        InventarioResponse[] inventarioResponseArray = webClient.get()
-                .uri("http://localhost:8082/api/inventario", uriBuilder -> uriBuilder
+        InventarioResponse[] inventarioResponseArray = webClientBuilder.build().get()
+                // .uri("http://localhost:8082/api/inventario", uriBuilder -> uriBuilder
+                .uri("http://inventario-service/api/inventario", uriBuilder -> uriBuilder
                         .queryParam("codigoSku", codigoSku).build())
                 .retrieve()
                 // .bodyToMono(InventarioResponse[].class)
