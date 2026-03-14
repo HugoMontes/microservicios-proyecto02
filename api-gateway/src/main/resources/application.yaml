@@ -54,6 +54,15 @@ spring:
                 - Path=/eureka/**  # Captura todo lo que empiece con /eureka/
               # Nota: No tiene filtros para no interferir con los recursos estáticos
 
+  # ==============================================
+  # Punto de entrada para los clientes
+  # ==============================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/proyecto02-microservicios-realm
+
 # ==============================================
 # CONFIGURACIÓN DE LOGGING (NO USAR EN PRODUCCION)
 # ==============================================
