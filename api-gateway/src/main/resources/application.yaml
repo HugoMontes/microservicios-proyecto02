@@ -77,7 +77,8 @@ logging:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka:password@localhost:8761/eureka
+#      defaultZone: http://localhost:8761/eureka
     fetch-registry: true # necesario para resolver lb://
     register-with-eureka: true # para que aparezca en el dashboard
   instance:
