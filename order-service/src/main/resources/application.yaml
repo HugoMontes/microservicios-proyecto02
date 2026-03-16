@@ -27,3 +27,46 @@ eureka:
 #      defaultZone: http://localhost:8761/eureka
   instance:
     instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+
+# Configuracion que expone informacion detallada del estado de salud de la aplicacion
+management:
+  health:
+    circuitbreakers:
+      enabled: true # 1. Activa la info de Circuit Breakers en el health check
+    endpoints:
+      web:
+        exposure:
+          include: "*" # 2. Expone el endpoint /actuator/health vía web
+  endpoint:
+    health:
+      show-details: always # 3. Muestra detalles completos (no solo "UP" o "DOWN")
+
+feign:
+  circuitbreaker:
+    enabled: true # Habilita la integración entre Feign y Resilience4j
+
+# Configuracion de Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventarioService: # Debe coincidir con el name en @CircuitBreaker
+        registerHealthIndicator: true # Exponer estado del breaker para monitoreo
+        eventConsumerBufferSize: 10 # Tamaño del buffer para eventos (Logs internos)
+        slidingWindowType: COUNT_BASED # Configuracion basada en numero de llamadas
+        slidingWindowSize: 5 # Numero de llamadas para evaluar el estado del breaker
+        failureRateThreshold: 50 # Abre el circuito si el 50% de las llamadas fallan
+        waitDurationInOpenState: 5s # Tiempo en estado OPEN antes de pasar a HALF_OPEN
+        permittedNumberOfCallsInHalfOpenState: 3 # Llamadas de prueba en estado HALF_OPEN
+        automaticTransitionFromOpenToHalfOpenEnabled: true # Pasa de ABIERTO a SEMI-ABIERTO automáticamente
+        minimumNumberOfCalls: 5 # Minimo de llamadas para calcular la tasa de fallos
+
+  timelimiter:
+    instances:
+      inventarioService:
+        timeout-duration: 3s # Tiempo máximo de espera antes de considerar la llamada como fallida
+
+  retry:
+    instances:
+      inventarioService: # Nombre del retry (debe coincidir con @Retry)
+        max-attempts: 3 # Número máximo de intentos
+        wait-duration: 5s # Tiempo de espera entre intentos

@@ -31,7 +31,8 @@ public class OrderService {
     }
 
     // Procesa y guarda un nuevo pedido
-    public void placeOrder(OrderRequest orderRequest) {
+    @Transactional(readOnly = true)
+    public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         // Asignar un identificador unico
         order.setNumeroPedido(UUID.randomUUID().toString());
@@ -70,6 +71,7 @@ public class OrderService {
         if (allProductosInStock) {
             // Persistir en base de datos
             orderRepository.save(order);
+            return "Pedido ordenado con exito";
         } else {
             // Lanzar excepción si algún producto no tiene stock
             throw new IllegalArgumentException("El producto no esta en stock");
