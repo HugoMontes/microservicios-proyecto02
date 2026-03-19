@@ -25,9 +25,9 @@ public class InventarioService {
     @SneakyThrows
     public List<InventarioResponse> isInStock(List<String> listaCodigosSku) {
         // Simular que el microservicio esta lento con una demora de 10 segundos
-        log.info("Wait started");
-        Thread.sleep(10000);
-        log.info("Wait end");
+//        log.info("Wait started");
+//        Thread.sleep(10000);
+//        log.info("Wait end");
         // Buscar en BD todos los productos cuyos SKU estén en la lista proporcionada
         List<Inventario> inventarioEncontrado = inventarioRepository.findByCodigoSkuIn(listaCodigosSku);
         // Transformar la lista de entidades a DTOs usando Stream API

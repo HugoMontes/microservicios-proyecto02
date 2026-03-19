@@ -31,7 +31,7 @@ public class OrderService {
     }
 
     // Procesa y guarda un nuevo pedido
-    @Transactional(readOnly = true)
+    // @Transactional(readOnly = true)
     public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         // Asignar un identificador unico

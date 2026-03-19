@@ -10,3 +10,7 @@ eureka:
     serviceUrl:
       defaultZone: http://eureka:password@localhost:8761/eureka
 #      defaultZone: http://localhost:8761/eureka
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"

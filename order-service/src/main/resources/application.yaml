@@ -33,10 +33,10 @@ management:
   health:
     circuitbreakers:
       enabled: true # 1. Activa la info de Circuit Breakers en el health check
-    endpoints:
-      web:
-        exposure:
-          include: "*" # 2. Expone el endpoint /actuator/health vía web
+  endpoints:
+    web:
+      exposure:
+        include: "*" # 2. Expone el endpoint /actuator/health vía web
   endpoint:
     health:
       show-details: always # 3. Muestra detalles completos (no solo "UP" o "DOWN")
@@ -70,3 +70,7 @@ resilience4j:
       inventarioService: # Nombre del retry (debe coincidir con @Retry)
         max-attempts: 3 # Número máximo de intentos
         wait-duration: 5s # Tiempo de espera entre intentos
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"

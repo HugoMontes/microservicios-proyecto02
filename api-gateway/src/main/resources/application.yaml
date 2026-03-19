@@ -70,6 +70,8 @@ logging:
   level:
     root: INFO  # Nivel por defecto para toda la aplicación
     org.springframework.cloud.gateway: INFO  # Logs DETALLADOS del Gateway (NO USAR EN PRODUCCION)
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"
 
 # ==============================================
 # CONFIGURACIÓN DE EUREKA (CLIENTE)
