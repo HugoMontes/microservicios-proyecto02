@@ -1,0 +1,32 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: notification-service
+
+  kafka:
+    # Dirección del broker de Kafka
+    bootstrap-servers: localhost:9092
+    # CONFIGURACIÓN DEL CONSUMIDOR
+    consumer:
+      group-id: notificationId
+      # Deserializador para la CLAVE del mensaje (String)
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # Deserializador para el VALOR del mensaje (JSON → Objeto Java)
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      # Propiedades adicionales para el deserializador JSON
+      properties:
+        # Mapeo de tipos: el alias "event" se corresponde con la clase OrderPlacedEvent
+        spring.json.type.mapping: "event:com.msvc.notification.event.OrderPlacedEvent"
+        # Permite deserializar a clases sin que estén en el classpath (evita errores)
+        spring.json.trusted.packages: "*"
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"

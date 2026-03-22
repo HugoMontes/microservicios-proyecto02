@@ -5,7 +5,10 @@ import com.msvc.order.dto.OrderLineItemDto;
 import com.msvc.order.dto.OrderRequest;
 import com.msvc.order.entity.Order;
 import com.msvc.order.entity.OrderLineItems;
+import com.msvc.order.event.OrderPlacedEvent;
 import com.msvc.order.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,6 +26,9 @@ public class OrderService {
 
     // private final WebClient webClient;
     private final WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     // Constructor para inyeccion de dependencias
     public OrderService(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
@@ -71,6 +77,8 @@ public class OrderService {
         if (allProductosInStock) {
             // Persistir en base de datos
             orderRepository.save(order);
+            // Una vez guardado el producto enviamos un mensaje de un servicio a otro
+            kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getNumeroPedido()));
             return "Pedido ordenado con exito";
         } else {
             // Lanzar excepción si algún producto no tiene stock
