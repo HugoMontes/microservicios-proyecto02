@@ -16,3 +16,10 @@ app:
   eureka:
     username: eureka
     password: password
+
+# CONFIGURACION PROMETHEUS
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

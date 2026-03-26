@@ -30,3 +30,10 @@ eureka:
 logging:
   pattern:
     level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"
+
+# CONFIGURACION PROMETHEUS
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus

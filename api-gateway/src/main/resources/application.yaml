@@ -85,3 +85,10 @@ eureka:
     register-with-eureka: true # para que aparezca en el dashboard
   instance:
     prefer-ip-address: true  # evita problemas con hostnames en Windows
+
+# CONFIGURACION PROMETHEUS
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
