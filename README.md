@@ -20,4 +20,9 @@
 ```shell
 -javaagent:D:\otel\opentelemetry-javaagent.jar -Dotel.service.name=notification-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://localhost:9411/api/v2/spans -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
 ```
+- Command agent for "message-service"
+```shell
+-javaagent:D:\otel\opentelemetry-javaagent.jar -Dotel.service.name=message-service -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://localhost:9411/api/v2/spans -Dotel.metrics.exporter=none -Dotel.logs.exporter=none
+```
+
 
