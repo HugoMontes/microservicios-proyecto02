@@ -30,6 +30,16 @@ spring:
       properties:
         spring.json.type.mapping: "event:com.msvc.order.event.OrderPlacedEvent"
 
+  rabbitmq:
+    host: localhost # Dirección del servidor RabbitMQ
+    ports: 5672     # Puerto AMQP (donde escucha RabbitMQ)
+    username: guest # Usuario para autenticación
+    password: guest # Contraseña del usuario
+
+rabbitmq:
+  exchange: order-exchange   # Nombre del exchange donde se publicarán los mensajes
+  routing-key: order.created # Clave de enrutamiento para los mensajes
+
 eureka:
   client:
     serviceUrl:

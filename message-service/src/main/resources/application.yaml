@@ -1,3 +1,29 @@
+server:
+  port: 8091
+
 spring:
   application:
     name: message-service
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{trace_id} spanId=%X{span_id}]"
+
+# CONFIGURACION PROMETHEUS
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+
+# CONFIGURACIÓN DE RABBITMQ (CONSUMIDOR)
+rabbitmq:
+  exchange: order-exchange        # Nombre del exchange donde se publican los eventos.
+  routing-key: order.created      # Clave de enrutamiento que este consumidor quiere escuchar.
+  queue:
+    name: order.created.queue     # Nombre de la cola exclusiva de este servicio.

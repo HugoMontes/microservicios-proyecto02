@@ -1,5 +1,6 @@
 package com.msvc.order.service;
 
+import com.msvc.order.config.rabbitmq.Producer;
 import com.msvc.order.dto.InventarioResponse;
 import com.msvc.order.dto.OrderLineItemDto;
 import com.msvc.order.dto.OrderRequest;
@@ -7,6 +8,7 @@ import com.msvc.order.entity.Order;
 import com.msvc.order.entity.OrderLineItems;
 import com.msvc.order.event.OrderPlacedEvent;
 import com.msvc.order.repository.OrderRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service // Indica que esta clase es un bean de servicio de Spring
 @Transactional // Asegura que todos los métodos mantengan coherencia transaccional con la BD
 public class OrderService {
@@ -29,6 +32,9 @@ public class OrderService {
 
     @Autowired
     private KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+
+    @Autowired
+    private Producer producer;
 
     // Constructor para inyeccion de dependencias
     public OrderService(OrderRepository orderRepository, WebClient.Builder webClientBuilder) {
@@ -77,6 +83,7 @@ public class OrderService {
         if (allProductosInStock) {
             // Persistir en base de datos
             orderRepository.save(order);
+            enviarMensajeConRabbitMQ("Notificacion con RabbitMQ, pedido ordenado con exito.");
             // Una vez guardado el producto enviamos un mensaje de un servicio a otro
             kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getNumeroPedido()));
             return "Pedido ordenado con exito";
@@ -84,6 +91,11 @@ public class OrderService {
             // Lanzar excepción si algún producto no tiene stock
             throw new IllegalArgumentException("El producto no esta en stock");
         }
+    }
+
+    private void enviarMensajeConRabbitMQ(String message){
+        log.info("El mensaje '{}' fue enviado con exito", message);
+        producer.send(message);
     }
 
     // Convierte un DTO (OrderLineItemDto) a una entidad (OrderLineItems).
